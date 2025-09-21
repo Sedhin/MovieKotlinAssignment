@@ -93,7 +93,7 @@ fun MovieApp(viewModel: MovieViewModel = viewModel()) {
                     viewModel.searchMovies(query)
                     // You can implement search filtering here if needed
                 },
-                onRetry = {
+                onRetry =   {
                     viewModel.loadMovies()
                 }
             )
