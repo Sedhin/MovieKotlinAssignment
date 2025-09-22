@@ -50,20 +50,8 @@ import androidx.compose.foundation.shape.CircleShape
 import coil.size.Precision
 import coil.size.Scale
 
-//data class Movie(
-//    val id: Int,
-//    val title: String,
-//    val releaseDate: String,
-//    val rating: Float,
-//    val posterUrl: String,
-//    val genre: String = "",
-//    val synopsis: String = "",
-//    val director: String = "",
-//    val cast: List<String> = emptyList(),
-//    val isFavorite: Boolean = false
-//)
 
-// Navigation destinations
+
 object Destinations {
     const val MOVIE_LIST = "movie_list"
     const val MOVIE_DETAIL = "movie_detail/{movieId}"
@@ -140,58 +128,7 @@ fun MovieListScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        // Search Bar (same as before)
-      /*  Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, bottom = 20.dp,start = 5.dp, end = 5.dp,),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
 
-                TextField(
-                    value = searchQuery,
-                    onValueChange = {
-                        searchQuery = it
-                        onSearchQueryChange(it) // This will call viewModel.searchMovies()
-                    },
-                    placeholder = {
-                        Text(
-                            "Search movies...",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    singleLine = true, // ADD THIS - prevents text wrapping
-                    maxLines = 1,      // ADD THIS - keeps it to one line
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
-
-
-
-                IconButton(onClick = { *//* Handle menu *//* }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }*/
 
         Scaffold(
             topBar = {
@@ -268,9 +205,9 @@ fun MovieListScreen(
                                     }
                                 )
 
-                                Divider() // Visual separator
+                                Divider()
 
-                                // EXISTING SORT OPTIONS
+
                                 DropdownMenuItem(
                                     text = { Text("Title A-Z") },
                                     onClick = {
@@ -319,7 +256,6 @@ fun MovieListScreen(
                 }
             }
         ) { paddingValues ->
-            // Your movie list goes here, using paddingValues to avoid overlap
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -340,10 +276,6 @@ fun MovieListScreen(
             }
         }
 
-
-
-
-        // Content Area - Use movies directly (filtering handled in ViewModel)
         when {
             isLoading -> {
                 Box(
@@ -368,7 +300,6 @@ fun MovieListScreen(
             }
 
             errorMessage != null -> {
-                // Error state (same as before)
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -384,7 +315,7 @@ fun MovieListScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Oops! Something went wrong",
+                            text = "Please Connect to Network",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center
@@ -408,7 +339,7 @@ fun MovieListScreen(
             }
 
             movies.isEmpty() -> {
-                // Empty state
+
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -439,7 +370,7 @@ fun MovieListScreen(
             }
 
             else -> {
-                // OPTIMIZED LAZY COLUMN FOR SMOOTH SCROLLING
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
@@ -449,7 +380,6 @@ fun MovieListScreen(
                         bottom = 16.dp
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    // Key performance optimizations:
                     flingBehavior = ScrollableDefaults.flingBehavior(),
                     userScrollEnabled = true
                 ) {
@@ -467,26 +397,6 @@ fun MovieListScreen(
                 }
             }
 
-//            else -> {
-//                // Movie List - Use pre-filtered movies from ViewModel
-//                LazyColumn
-//                modifier = Modifier.fillMaxSize(),
-//                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-//                verticalArrangement = Arrangement.spacedBy(12.dp)
-//                ) {
-//                    items(
-//                        items = movies,
-//                        key = { movie -> movie.id },
-//                        contentType = { "MovieCard" }
-//                    ) { movie ->
-//                        MovieCard(
-//                            movie = movie,
-//                            onMovieClick = { onMovieClick(movie) },
-//                            onFavoriteClick = { onFavoriteClick(movie) }
-//                        )
-//                    }
-//                }
-//            }
         }
 
         CheckAllImagesLoaded(movies = movies, viewModel = viewModel())
@@ -514,7 +424,6 @@ fun MovieCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // OPTIMIZED Movie Poster with progress indicator
             Card(
                 modifier = Modifier.size(40.dp),
                 shape = RoundedCornerShape(8.dp),
@@ -524,14 +433,12 @@ fun MovieCard(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Background placeholder
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     )
 
-                    // Actual image
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(movie.posterUrl)
@@ -553,16 +460,7 @@ fun MovieCard(
                         contentScale = ContentScale.Crop
                     )
 
-                    // Loading progress indicator for image
                     if (imageLoading) {
-//                        Box(
-//                            modifier = Modifier
-//                                .fillMaxSize()
-//                                .background(
-//                                    Color.Black.copy(alpha = 0.3f)
-//                                ),
-//                            contentAlignment = Alignment.Center
-//                        )
                         Box(
                             modifier = Modifier
                                 .size(60.dp)
@@ -583,7 +481,6 @@ fun MovieCard(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Movie Details
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -638,7 +535,6 @@ fun MovieCard(
                 }
             }
 
-            // Favorite Button
             IconButton(
                 onClick = onFavoriteClick,
                 modifier = Modifier.size(48.dp)
@@ -658,7 +554,6 @@ fun MovieCard(
 fun LoadingScreen() {
     var progress by remember { mutableFloatStateOf(0f) }
 
-    // Animate progress from 0 to 1 over 3 seconds
     LaunchedEffect(Unit) {
         animate(
             initialValue = 0f,
@@ -681,7 +576,6 @@ fun LoadingScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(32.dp)
         ) {
-            // Movie loading animation
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -715,7 +609,6 @@ fun LoadingScreen() {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Circular Progress Indicator
             Box(contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
                     progress = { progress },
@@ -725,7 +618,6 @@ fun LoadingScreen() {
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
 
-                // Percentage text in center
                 Text(
                     text = "${(progress * 100).toInt()}%",
                     style = MaterialTheme.typography.labelMedium,
@@ -736,7 +628,6 @@ fun LoadingScreen() {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Loading text
             Text(
                 text = "Loading Movies...",
                 style = MaterialTheme.typography.headlineSmall,
@@ -746,7 +637,6 @@ fun LoadingScreen() {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Dynamic loading messages
             val loadingMessages = listOf(
                 "Fetching movie data...",
                 "Loading amazing films...",
@@ -768,7 +658,6 @@ fun LoadingScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Linear progress bar
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier
@@ -794,7 +683,6 @@ fun MovieDetailScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Top App Bar
         TopAppBar(
             title = {
                 Text(
@@ -826,14 +714,12 @@ fun MovieDetailScreen(
             )
         )
 
-        // Scrollable Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // Movie Poster
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -858,7 +744,6 @@ fun MovieDetailScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Movie Information
             Text(
                 text = movie.title,
                 fontSize = 28.sp,
@@ -876,7 +761,6 @@ fun MovieDetailScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Rating
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -906,7 +790,6 @@ fun MovieDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Synopsis Section
             if (movie.synopsis.isNotEmpty()) {
                 Text(
                     text = "Synopsis/Description",
@@ -928,7 +811,6 @@ fun MovieDetailScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Director Section
             if (movie.director.isNotEmpty()) {
                 Text(
                     text = "Director",
@@ -948,7 +830,6 @@ fun MovieDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Cast Section
             if (movie.cast.isNotEmpty()) {
                 Text(
                     text = "Cast",
@@ -974,81 +855,6 @@ fun MovieDetailScreen(
     }
 }
 
-// Enhanced sample data with detailed information
-val sampleMoviesDetailed = listOf(
-    Movie(
-        id = 1,
-        title = "The Dark Knight",
-        releaseDate = "July 18, 2008",
-        rating = 9.0f,
-        posterUrl = "",
-        genre = "Action/Crime/Drama",
-        synopsis = "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.",
-        director = "Christopher Nolan",
-        cast = listOf(
-            "Christian Bale",
-            "Heath Ledger",
-            "Aaron Eckhart",
-            "Michael Caine",
-            "Maggie Gyllenhaal"
-        ),
-        isFavorite = true
-    ),
-    Movie(
-        id = 2,
-        title = "Inception",
-        releaseDate = "July 16, 2010",
-        rating = 8.8f,
-        posterUrl = "",
-        genre = "Action/Sci-Fi/Thriller",
-        synopsis = "Dom Cobb is a skilled thief, the absolute best in the dangerous art of extraction, stealing valuable secrets from deep within the subconscious during the dream state, when the mind is at its most vulnerable. Cobb's rare ability has made him a coveted player in this treacherous new world of corporate espionage, but it has also made him an international fugitive and cost him everything he has ever loved.",
-        director = "Christopher Nolan",
-        cast = listOf(
-            "Leonardo DiCaprio",
-            "Marion Cotillard",
-            "Tom Hardy",
-            "Ellen Page",
-            "Ken Watanabe"
-        ),
-        isFavorite = false
-    ),
-    Movie(
-        id = 3,
-        title = "Interstellar",
-        releaseDate = "November 7, 2014",
-        rating = 8.6f,
-        posterUrl = "",
-        genre = "Adventure/Drama/Sci-Fi",
-        synopsis = "Earth's future has been riddled by disasters, famines, and droughts. There is only one way to ensure mankind's survival: Interstellar travel. A newly discovered wormhole in the far reaches of our solar system allows a team of astronauts to go where no man has gone before, a planet that may have the right environment to sustain human life.",
-        director = "Christopher Nolan",
-        cast = listOf(
-            "Matthew McConaughey",
-            "Anne Hathaway",
-            "Jessica Chastain",
-            "Bill Irwin",
-            "Ellen Burstyn"
-        ),
-        isFavorite = true
-    ),
-    Movie(
-        id = 4,
-        title = "The Matrix",
-        releaseDate = "March 31, 1999",
-        rating = 8.7f,
-        posterUrl = "",
-        genre = "Action/Sci-Fi",
-        synopsis = "Thomas A. Anderson is a man living two lives. By day he is an average computer programmer and by night a hacker known as Neo. Neo has always questioned his reality, but the truth is far beyond his imagination. Neo finds himself targeted by the police when he is contacted by Morpheus, a legendary computer hacker branded a terrorist by the government.",
-        director = "The Wachowskis",
-        cast = listOf(
-            "Keanu Reeves",
-            "Laurence Fishburne",
-            "Carrie-Anne Moss",
-            "Hugo Weaving",
-            "Gloria Foster"
-        ),
-        isFavorite = false
-    )
-)
 
 @Preview(showBackground = true)
 @Composable
@@ -1068,10 +874,4 @@ fun CheckAllImagesLoaded(movies: List<Movie>, viewModel: MovieViewModel) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun MovieDetailScreenPreview() {
-    MaterialTheme {
-        MovieDetailScreen(movie = sampleMoviesDetailed[0])
-    }
-}
+

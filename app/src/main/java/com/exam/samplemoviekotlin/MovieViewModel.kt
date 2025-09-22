@@ -8,10 +8,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
+
 class MovieViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = MovieRepository(application.applicationContext)
 
     var movies by mutableStateOf<List<Movie>>(emptyList())
+        private set
+
+    var favoriteMoviesFromDb by mutableStateOf<List<Movie>>(emptyList())
         private set
 
     var isLoading by mutableStateOf(false)
@@ -20,7 +24,6 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
-    // Add filtered movies state for better search performance
     var filteredMovies by mutableStateOf<List<Movie>>(emptyList())
         private set
 
@@ -51,7 +54,27 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         loadMovies()
+        loadFavoriteMovies()
     }
+
+    private fun loadFavoriteMovies() {
+        viewModelScope.launch {
+            repository.getAllFavorites().collect { favoriteMovies ->
+                favoriteMoviesFromDb = favoriteMovies.map { it.toMovie() }
+                // Update existing movies with favorite status
+                updateMoviesWithFavoriteStatus()
+            }
+        }
+    }
+    private suspend fun updateMoviesWithFavoriteStatus() {
+        val favoriteIds = repository.getFavoriteMovieIds()
+        movies = movies.map { movie ->
+            movie.copy(isFavorite = favoriteIds.contains(movie.id))
+        }
+        applyFilters()
+    }
+
+
 
     fun sortMovies(sortOption: SortOption) {
         currentSortOption = sortOption
@@ -72,12 +95,10 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
     private fun applyFilters() {
         var result = movies
 
-        // Apply favorites filter
         if (showFavoritesOnly) {
             result = result.filter { it.isFavorite }
         }
 
-        // Apply search filter
         if (searchQuery.isNotEmpty()) {
             result = result.filter { movie ->
                 movie.title.contains(searchQuery, ignoreCase = true) ||
@@ -98,7 +119,9 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
             repository.getMovies()
                 .onSuccess { movieList ->
                     movies = movieList
-                    filteredMovies = movieList
+                    updateMoviesWithFavoriteStatus()
+                    filteredMovies = movies
+//                    filteredMovies = movieList
                     isLoading = false
                 }
                 .onFailure { exception ->
@@ -113,29 +136,25 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
         applyFilters()
     }
 
-    /*fun searchMovies(query: String) {
-        searchQuery = query
-        applyFilters()
-        filteredMovies = if (query.isEmpty()) {
-            movies
-        } else {
-            movies.filter {
-                it.title.contains(query, ignoreCase = true) ||
-                        it.genre.contains(query, ignoreCase = true)
-            }
-        }
-    }*/
+
 
     fun toggleFavorite(movieId: Int) {
-        movies = movies.map { movie ->
-            if (movie.id == movieId) {
-                movie.copy(isFavorite = !movie.isFavorite)
+        viewModelScope.launch {
+            val movie = movies.find { it.id == movieId } ?: return@launch
+
+            if (movie.isFavorite) {
+                repository.removeFromFavorites(movieId)
             } else {
-                movie
+                repository.addToFavorites(movie)
             }
+
+            movies = movies.map {
+                if (it.id == movieId) {
+                    it.copy(isFavorite = !it.isFavorite)
+                } else it
+            }
+            applyFilters()
         }
-        // Update filtered movies as well
-        searchMovies(searchQuery)
     }
 
     fun getMovieById(id: Int): Movie? {

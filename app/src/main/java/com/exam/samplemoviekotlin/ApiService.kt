@@ -18,7 +18,6 @@ interface ApiService {
         private const val BASE_URL = "https://68cc08ab716562cf507620db.mockapi.io/"
 
         fun create(cacheDir: File): ApiService {
-            // Create cache for network responses
             val cache = Cache(
                 directory = File(cacheDir, "http_cache"),
                 maxSize = 50L * 1024L * 1024L // 50 MB cache
