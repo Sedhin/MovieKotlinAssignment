@@ -8,6 +8,8 @@ import kotlinx.coroutines.withContext
 
 class MovieRepository(private val context: Context) {
     private val apiService = ApiService.create(context.cacheDir)
+    private val database = MovieDatabase.getDatabase(context)
+    private val favoriteDao = database.favoriteMovieDao()
 
     suspend fun getMovies(): Result<List<Movie>> {
         return withContext(Dispatchers.IO) {
@@ -24,4 +26,17 @@ class MovieRepository(private val context: Context) {
             }
         }
     }
+    suspend fun addToFavorites(movie: Movie) {
+        favoriteDao.insertFavorite(movie.toFavoriteMovie())
+    }
+
+    suspend fun removeFromFavorites(movieId: Int) {
+        favoriteDao.deleteFavoriteById(movieId)
+    }
+
+    suspend fun getFavoriteMovieIds(): List<Int> {
+        return favoriteDao.getFavoriteMovieIds()
+    }
+
+    fun getAllFavorites() = favoriteDao.getAllFavorites()
 }

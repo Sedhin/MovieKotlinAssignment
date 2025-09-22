@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
 
-// API Response Models
 data class ApiMovieResponse(
     val id: String,
     val createdAt: Long? = null,
@@ -28,7 +27,6 @@ data class Rating(
     val imdb: Double
 )
 
-// Convert API response to our Movie model
 fun ApiMovieResponse.toMovie(isFavorite: Boolean = false): Movie {
     val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
     val releaseDate = try {
