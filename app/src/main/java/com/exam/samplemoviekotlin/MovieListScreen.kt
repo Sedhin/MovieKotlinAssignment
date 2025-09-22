@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Divider
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -83,6 +84,7 @@ fun MovieApp(viewModel: MovieViewModel = viewModel()) {
                 movies = viewModel.filteredMovies,
                 isLoading = viewModel.isLoading,
                 errorMessage = viewModel.errorMessage,
+                viewModel = viewModel, // Add this line
                 onMovieClick = { movie ->
                     navController.navigate(Destinations.movieDetail(movie.id))
                 },
@@ -91,9 +93,8 @@ fun MovieApp(viewModel: MovieViewModel = viewModel()) {
                 },
                 onSearchQueryChange = { query ->
                     viewModel.searchMovies(query)
-                    // You can implement search filtering here if needed
                 },
-                onRetry =   {
+                onRetry = {
                     viewModel.loadMovies()
                 }
             )
@@ -125,6 +126,7 @@ fun MovieListScreen(
     movies: List<Movie> = emptyList(),
     isLoading: Boolean = false,
     errorMessage: String? = null,
+    viewModel: MovieViewModel,
     onMovieClick: (Movie) -> Unit = {},
     onFavoriteClick: (Movie) -> Unit = {},
     onSearchQueryChange: (String) -> Unit = {},
@@ -139,7 +141,7 @@ fun MovieListScreen(
             .padding(16.dp)
     ) {
         // Search Bar (same as before)
-        Card(
+      /*  Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp, bottom = 20.dp,start = 5.dp, end = 5.dp,),
@@ -181,15 +183,165 @@ fun MovieListScreen(
                     modifier = Modifier.weight(1f)
                 )
 
-                IconButton(onClick = { /* Handle menu */ }) {
+
+
+                IconButton(onClick = { *//* Handle menu *//* }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More options",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }*/
+
+        Scaffold(
+            topBar = {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp, bottom = 20.dp, start = 5.dp, end = 5.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp)
+                        )
+
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = {
+                                searchQuery = it
+                                onSearchQueryChange(it) // calls ViewModel
+                            },
+                            placeholder = {
+                                Text(
+                                    "Search movies...",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            singleLine = true,
+                            maxLines = 1,
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        var showSortMenu by remember { mutableStateOf(false) }
+
+                        Box {
+                            IconButton(onClick = { showSortMenu = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Sort options",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = showSortMenu,
+                                onDismissRequest = { showSortMenu = false }
+                            ) {
+                                // FAVORITES FILTER OPTIONS
+                                DropdownMenuItem(
+                                    text = { Text("Show Favorites Only") },
+                                    onClick = {
+                                        viewModel.filterFavorites(true)
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Show All Movies") },
+                                    onClick = {
+                                        viewModel.filterFavorites(false)
+                                        showSortMenu = false
+                                    }
+                                )
+
+                                Divider() // Visual separator
+
+                                // EXISTING SORT OPTIONS
+                                DropdownMenuItem(
+                                    text = { Text("Title A-Z") },
+                                    onClick = {
+                                        viewModel.sortMovies(MovieViewModel.SortOption.TITLE_ASC)
+                                        showSortMenu = false // Fixed: was missing showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Title Z-A") },
+                                    onClick = {
+                                        viewModel.sortMovies(MovieViewModel.SortOption.TITLE_DESC)
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Release Date Oldest") },
+                                    onClick = {
+                                        viewModel.sortMovies(MovieViewModel.SortOption.RELEASE_DATE_ASC)
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Release Date Newest") },
+                                    onClick = {
+                                        viewModel.sortMovies(MovieViewModel.SortOption.RELEASE_DATE_DESC)
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Rating Low to High") },
+                                    onClick = {
+                                        viewModel.sortMovies(MovieViewModel.SortOption.RATING_ASC) // Fixed: was missing 'viewModel.'
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Rating High to Low") },
+                                    onClick = {
+                                        viewModel.sortMovies(MovieViewModel.SortOption.RATING_DESC)
+                                        showSortMenu = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        ) { paddingValues ->
+            // Your movie list goes here, using paddingValues to avoid overlap
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(
+                    items = movies,
+                    key = { movie -> movie.id }
+                ) { movie ->
+                    MovieCard(
+                        movie = movie,
+                        onMovieClick = { onMovieClick(movie) },
+                        onFavoriteClick = { onFavoriteClick(movie) }
+                    )
                 }
             }
         }
+
+
+
 
         // Content Area - Use movies directly (filtering handled in ViewModel)
         when {

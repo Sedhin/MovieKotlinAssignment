@@ -31,11 +31,64 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
         allImagesLoaded = true
     }
 
+    enum class SortOption {
+        TITLE_ASC, TITLE_DESC,
+        RELEASE_DATE_ASC, RELEASE_DATE_DESC,
+        RATING_ASC, RATING_DESC
+    }
+    var showFavoritesOnly by mutableStateOf(false)
+        private set
+
+    var currentSortOption by mutableStateOf(SortOption.TITLE_ASC)
+        private set
+
+    fun filterFavorites(favoritesOnly: Boolean) {
+        showFavoritesOnly = favoritesOnly
+        applyFilters()
+    }
+
     private var searchQuery by mutableStateOf("")
 
     init {
         loadMovies()
     }
+
+    fun sortMovies(sortOption: SortOption) {
+        currentSortOption = sortOption
+
+        val sortedMovies = when (sortOption) {
+            SortOption.TITLE_ASC -> movies.sortedBy { it.title }
+            SortOption.TITLE_DESC -> movies.sortedByDescending { it.title }
+            SortOption.RELEASE_DATE_ASC -> movies.sortedBy { it.releaseDate }
+            SortOption.RELEASE_DATE_DESC -> movies.sortedByDescending { it.releaseDate }
+            SortOption.RATING_ASC -> movies.sortedBy { it.rating }
+            SortOption.RATING_DESC -> movies.sortedByDescending { it.rating }
+        }
+
+        movies = sortedMovies
+        applyFilters()
+    }
+
+    private fun applyFilters() {
+        var result = movies
+
+        // Apply favorites filter
+        if (showFavoritesOnly) {
+            result = result.filter { it.isFavorite }
+        }
+
+        // Apply search filter
+        if (searchQuery.isNotEmpty()) {
+            result = result.filter { movie ->
+                movie.title.contains(searchQuery, ignoreCase = true) ||
+                        movie.genre.contains(searchQuery, ignoreCase = true)
+            }
+        }
+
+        filteredMovies = result
+    }
+
+
 
     fun loadMovies() {
         viewModelScope.launch {
@@ -57,6 +110,12 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
 
     fun searchMovies(query: String) {
         searchQuery = query
+        applyFilters()
+    }
+
+    /*fun searchMovies(query: String) {
+        searchQuery = query
+        applyFilters()
         filteredMovies = if (query.isEmpty()) {
             movies
         } else {
@@ -65,7 +124,7 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                         it.genre.contains(query, ignoreCase = true)
             }
         }
-    }
+    }*/
 
     fun toggleFavorite(movieId: Int) {
         movies = movies.map { movie ->
