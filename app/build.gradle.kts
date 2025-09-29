@@ -6,7 +6,6 @@ plugins {
 
 }
 
-
 android {
     namespace = "com.exam.samplemoviekotlin"
     compileSdk = 36

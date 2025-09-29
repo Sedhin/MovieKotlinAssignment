@@ -20,11 +20,11 @@ interface ApiService {
         fun create(cacheDir: File): ApiService {
             val cache = Cache(
                 directory = File(cacheDir, "http_cache"),
-                maxSize = 50L * 1024L * 1024L // 50 MB cache
+                maxSize = 50L * 1024L * 1024L
             )
 
             val loggingInterceptor = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC // Reduced logging
+                level = HttpLoggingInterceptor.Level.BASIC
             }
 
             val client = OkHttpClient.Builder()

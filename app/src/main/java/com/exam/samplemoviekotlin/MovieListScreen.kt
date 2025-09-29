@@ -50,8 +50,6 @@ import androidx.compose.foundation.shape.CircleShape
 import coil.size.Precision
 import coil.size.Scale
 
-
-
 object Destinations {
     const val MOVIE_LIST = "movie_list"
     const val MOVIE_DETAIL = "movie_detail/{movieId}"
@@ -72,7 +70,7 @@ fun MovieApp(viewModel: MovieViewModel = viewModel()) {
                 movies = viewModel.filteredMovies,
                 isLoading = viewModel.isLoading,
                 errorMessage = viewModel.errorMessage,
-                viewModel = viewModel, // Add this line
+                viewModel = viewModel,
                 onMovieClick = { movie ->
                     navController.navigate(Destinations.movieDetail(movie.id))
                 },
@@ -129,7 +127,6 @@ fun MovieListScreen(
             .padding(16.dp)
     ) {
 
-
         Scaffold(
             topBar = {
                 Card(
@@ -156,7 +153,7 @@ fun MovieListScreen(
                             value = searchQuery,
                             onValueChange = {
                                 searchQuery = it
-                                onSearchQueryChange(it) // calls ViewModel
+                                onSearchQueryChange(it)
                             },
                             placeholder = {
                                 Text(
@@ -189,7 +186,6 @@ fun MovieListScreen(
                                 expanded = showSortMenu,
                                 onDismissRequest = { showSortMenu = false }
                             ) {
-                                // FAVORITES FILTER OPTIONS
                                 DropdownMenuItem(
                                     text = { Text("Show Favorites Only") },
                                     onClick = {
@@ -286,7 +282,7 @@ fun MovieListScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(50.dp),
+                            modifier = Modifier.size(60.dp),
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -385,8 +381,8 @@ fun MovieListScreen(
                 ) {
                     items(
                         items = movies,
-                        key = { movie -> movie.id }, // Important for performance
-                        contentType = { "MovieCard" } // Helps with recycling
+                        key = { movie -> movie.id },
+                        contentType = { "MovieCard" }
                     ) { movie ->
                         MovieCard(
                             movie = movie,
@@ -444,7 +440,7 @@ fun MovieCard(
                             .data(movie.posterUrl)
                             .size(60)
                             .scale(Scale.FIT)
-                            .crossfade(150) // Smooth transition
+                            .crossfade(150)
                             .memoryCachePolicy(CachePolicy.ENABLED)
                             .diskCachePolicy(CachePolicy.ENABLED)
                             .allowHardware(false)
@@ -868,7 +864,7 @@ fun MovieAppPreview() {
 fun CheckAllImagesLoaded(movies: List<Movie>, viewModel: MovieViewModel) {
     LaunchedEffect(movies.size) {
         if (movies.isNotEmpty()) {
-            delay(10000) // Give images 2 seconds to load
+            delay(10000)
             viewModel.markImagesAsLoaded()
         }
     }
